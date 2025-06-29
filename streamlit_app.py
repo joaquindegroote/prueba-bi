@@ -4,7 +4,6 @@ from pathlib import Path
 import yaml
 
 st.set_page_config(page_title="Prueba BI Demo", layout="wide")
-st.sidebar.write("Tablas cargadas:", con.sql("SHOW TABLES").df())
 
 # 1. Load CSVs into DuckDB in-memory
 # ---------- Carga de datos en DuckDB ----------
@@ -19,49 +18,66 @@ def get_duck():
     return con
 
 con = get_duck()
+st.sidebar.write("Tablas cargadas:", con.sql("SHOW TABLES").df())
 
 # 2. Question catalogue (add/modify freely)
 QUESTIONS = {
     "Top 10 clientes por monto de siniestros": {
-        "sql": """            SELECT insured_full_name,
-               COUNT(*)             AS n_claims,
-               SUM(claim_amount)    AS total_amount
-        FROM claims_sample
-        GROUP BY insured_full_name
-        ORDER BY total_amount DESC
-        LIMIT 10;
+        "sql": """
+            SELECT insured_full_name,
+                   COUNT(*)          AS n_claims,
+                   SUM(claim_amount) AS total_amount
+            FROM claims_sample
+            GROUP BY insured_full_name
+            ORDER BY total_amount DESC
+            LIMIT 10;
         """,
         "brief": "Ranking de clientes (asegurado) según el monto total reclamado.",
-        "detail": """            Calculamos el valor reclamado total por asegurado para detectar             posibles concentraciones de riesgo o fraude. Se limita a los 10             mayores para facilitar la inspección manual por el equipo de siniestros."""
+        "detail": """
+            Calculamos el valor reclamado total por asegurado para detectar
+            posibles concentraciones de riesgo o fraude. Se limita a los 10
+            mayores para facilitar la inspección manual por el equipo de siniestros.
+        """
     },
+
     "Mora promedio de cuotas": {
-        "sql": """            WITH diff AS (
-          SELECT fee_id,
-                 julianday(paid_at) - julianday(due_date) AS days_late
-          FROM fees_populated
-          WHERE paid_at IS NOT NULL
-        )
-        SELECT ROUND(AVG(days_late),2) AS avg_days_late
-        FROM diff;
+        "sql": """
+            WITH diff AS (
+                SELECT
+                    fee_id,
+                    datediff('day', due_date::DATE, paid_at::DATE) AS days_late
+                FROM fees_populated
+                WHERE paid_at IS NOT NULL
+            )
+            SELECT ROUND(AVG(days_late), 2) AS avg_days_late
+            FROM diff;
         """,
         "brief": "Medimos la puntualidad de pago de las cuotas.",
         "detail": "El KPI sirve para el área de cobranzas y proyecciones de flujo."
     },
+
     "Pólizas activas vs canceladas": {
-        "sql": """            SELECT status, COUNT(*) AS qty
-        FROM policies_populated
-        GROUP BY status
-        ORDER BY qty DESC;
+        "sql": """
+            SELECT status, COUNT(*) AS qty
+            FROM policies_populated
+            GROUP BY status
+            ORDER BY qty DESC;
         """,
         "brief": "Estado portfolio de pólizas.",
         "detail": "Permite monitorear retención y churn."
     },
+
     "Duración media de conversación del bot": {
-        "sql": """            SELECT ROUND(AVG(
-          julianday(end_time) - julianday(start_time)
-        )*24*60,1) AS avg_minutes
-        FROM bot_conversations_sample
-        WHERE end_time IS NOT NULL;
+        "sql": """
+            SELECT ROUND(
+                       AVG(
+                           datediff('second',
+                                    start_time::TIMESTAMP,
+                                    end_time::TIMESTAMP)
+                       ) / 60.0,
+                   1) AS avg_minutes
+            FROM bot_conversations_sample
+            WHERE end_time IS NOT NULL;
         """,
         "brief": "Eficiencia del bot de IA (tiempo en minutos).",
         "detail": "Tiempo prolongado puede indicar complejidad o problemas de UX."
