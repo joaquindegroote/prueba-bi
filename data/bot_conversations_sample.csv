@@ -1,0 +1,101 @@
+conversation_id,customer_id,start_time,end_time,intents_detected,conversation_successful,transferred_to_agent,customer_feedback_score
+CONV00001,22,2025-06-12T18:56:11,2025-06-12T18:59:12,"[""pagar cuota"", ""cancelar póliza""]",True,False,3
+CONV00002,73,2025-06-11T11:07:47,2025-06-11T11:11:37,"[""revisión cobertura"", ""cambiar vehículo""]",False,False,1
+CONV00003,33,2025-04-07T08:25:51,2025-04-07T08:30:04,"[""pagar cuota""]",False,False,
+CONV00004,72,2025-05-04T01:41:22,2025-05-04T01:42:33,"[""cambiar vehículo"", ""pagar cuota"", ""consulta estado""]",True,True,1
+CONV00005,50,2025-04-25T11:54:36,2025-04-25T12:00:37,"[""revisión cobertura"", ""cambiar vehículo"", ""pagar cuota""]",True,False,2
+CONV00006,52,2025-05-04T11:27:13,2025-05-04T11:29:46,"[""pagar cuota"", ""consulta estado""]",False,False,4
+CONV00007,62,2025-05-09T15:53:58,2025-05-09T16:02:58,"[""revisión cobertura"", ""cancelar póliza"", ""pagar cuota""]",False,True,
+CONV00008,3,2025-05-10T22:21:25,2025-05-10T22:30:32,"[""pagar cuota""]",False,True,4
+CONV00009,91,2025-05-02T19:26:51,2025-05-02T19:32:30,"[""cambiar vehículo"", ""cancelar póliza""]",True,False,3
+CONV00010,17,2025-06-10T01:07:05,2025-06-10T01:16:19,"[""pagar cuota""]",True,False,4
+CONV00011,53,2025-06-21T12:17:24,2025-06-21T12:25:09,"[""cancelar póliza"", ""revisión cobertura"", ""cambiar vehículo""]",False,True,
+CONV00012,84,2025-05-08T17:06:16,2025-05-08T17:07:50,"[""pagar cuota""]",False,True,1
+CONV00013,65,2025-05-09T05:12:00,2025-05-09T05:16:07,"[""cambiar vehículo""]",True,False,2
+CONV00014,61,2025-06-04T18:50:56,2025-06-04T18:52:02,"[""cancelar póliza"", ""revisión cobertura"", ""pagar cuota""]",False,False,5
+CONV00015,20,2025-04-16T09:58:06,2025-04-16T10:04:13,"[""revisión cobertura"", ""cambiar vehículo"", ""cancelar póliza""]",False,False,4
+CONV00016,81,2025-04-25T01:40:02,2025-04-25T01:47:37,"[""cambiar vehículo"", ""revisión cobertura"", ""cancelar póliza""]",False,False,
+CONV00017,56,2025-04-24T19:31:47,2025-04-24T19:37:33,"[""revisión cobertura"", ""cancelar póliza"", ""pagar cuota""]",False,True,5
+CONV00018,59,2025-05-21T22:17:24,2025-05-21T22:26:54,"[""cambiar vehículo"", ""pagar cuota""]",True,False,3
+CONV00019,2,2025-06-12T16:01:41,2025-06-12T16:03:56,"[""revisión cobertura""]",True,False,1
+CONV00020,60,2025-06-28T19:34:43,2025-06-28T19:35:16,"[""revisión cobertura"", ""pagar cuota""]",True,False,2
+CONV00021,9,2025-06-08T04:00:57,2025-06-08T04:02:08,"[""cambiar vehículo"", ""cancelar póliza""]",False,False,
+CONV00022,8,2025-04-09T14:32:15,2025-04-09T14:39:38,"[""revisión cobertura"", ""cambiar vehículo""]",False,False,3
+CONV00023,82,2025-05-02T23:10:36,2025-05-02T23:18:18,"[""cancelar póliza"", ""pagar cuota""]",False,True,3
+CONV00024,4,2025-04-18T17:04:47,2025-04-18T17:10:26,"[""cancelar póliza""]",False,True,
+CONV00025,13,2025-05-28T23:56:54,2025-05-29T00:00:55,"[""consulta estado""]",False,True,5
+CONV00026,85,2025-06-25T00:45:43,2025-06-25T00:53:02,"[""pagar cuota""]",True,False,4
+CONV00027,21,2025-05-15T08:38:47,2025-05-15T08:43:22,"[""consulta estado"", ""cambiar vehículo"", ""revisión cobertura""]",True,False,
+CONV00028,8,2025-06-14T08:21:20,2025-06-14T08:31:01,"[""consulta estado"", ""pagar cuota"", ""cancelar póliza""]",True,True,4
+CONV00029,47,2025-05-18T08:53:54,2025-05-18T09:03:31,"[""cambiar vehículo"", ""pagar cuota""]",True,False,5
+CONV00030,58,2025-04-24T15:12:23,2025-04-24T15:20:52,"[""pagar cuota"", ""cambiar vehículo""]",True,False,4
+CONV00031,13,2025-06-07T11:05:46,2025-06-07T11:15:34,"[""consulta estado"", ""revisión cobertura"", ""cambiar vehículo""]",False,False,3
+CONV00032,61,2025-06-19T19:34:05,2025-06-19T19:43:37,"[""revisión cobertura"", ""cancelar póliza""]",False,False,
+CONV00033,58,2025-04-30T12:11:34,2025-04-30T12:15:14,"[""cancelar póliza"", ""pagar cuota""]",True,False,2
+CONV00034,23,2025-04-16T19:49:07,2025-04-16T19:56:50,"[""cambiar vehículo"", ""consulta estado"", ""pagar cuota""]",False,True,1
+CONV00035,82,2025-06-18T23:23:15,2025-06-18T23:28:24,"[""revisión cobertura""]",True,True,
+CONV00036,33,2025-05-05T19:08:44,2025-05-05T19:09:31,"[""revisión cobertura"", ""pagar cuota""]",True,True,
+CONV00037,84,2025-04-24T06:30:27,2025-04-24T06:38:29,"[""consulta estado""]",True,True,2
+CONV00038,50,2025-05-21T11:12:14,2025-05-21T11:16:34,"[""cancelar póliza"", ""consulta estado"", ""revisión cobertura""]",False,False,
+CONV00039,80,2025-04-22T21:12:38,2025-04-22T21:17:45,"[""pagar cuota"", ""revisión cobertura"", ""consulta estado""]",True,False,1
+CONV00040,51,2025-06-17T06:43:58,2025-06-17T06:53:34,"[""cambiar vehículo""]",True,True,5
+CONV00041,68,2025-06-24T17:04:22,2025-06-24T17:08:08,"[""revisión cobertura""]",False,True,
+CONV00042,53,2025-06-13T09:11:52,2025-06-13T09:19:17,"[""consulta estado""]",True,True,2
+CONV00043,58,2025-04-12T17:33:36,2025-04-12T17:42:40,"[""cambiar vehículo""]",False,False,5
+CONV00044,44,2025-06-22T14:02:55,2025-06-22T14:05:08,"[""cambiar vehículo"", ""pagar cuota""]",False,True,
+CONV00045,69,2025-05-16T12:17:18,2025-05-16T12:23:05,"[""revisión cobertura"", ""pagar cuota"", ""cambiar vehículo""]",True,False,1
+CONV00046,9,2025-05-10T16:58:35,2025-05-10T17:06:21,"[""pagar cuota"", ""revisión cobertura""]",True,False,4
+CONV00047,18,2025-04-21T00:08:15,2025-04-21T00:16:15,"[""revisión cobertura"", ""cambiar vehículo"", ""pagar cuota""]",False,False,5
+CONV00048,61,2025-05-30T13:32:23,2025-05-30T13:41:38,"[""consulta estado""]",True,True,4
+CONV00049,15,2025-05-18T16:55:58,2025-05-18T17:05:23,"[""cancelar póliza"", ""cambiar vehículo"", ""consulta estado""]",True,True,1
+CONV00050,28,2025-05-10T04:08:00,2025-05-10T04:09:07,"[""pagar cuota"", ""cambiar vehículo"", ""consulta estado""]",True,True,5
+CONV00051,74,2025-04-23T21:41:09,2025-04-23T21:44:20,"[""cambiar vehículo"", ""pagar cuota"", ""consulta estado""]",True,False,1
+CONV00052,5,2025-06-02T02:08:30,2025-06-02T02:16:17,"[""cancelar póliza""]",False,True,
+CONV00053,28,2025-04-30T23:58:44,2025-05-01T00:01:57,"[""cancelar póliza"", ""revisión cobertura""]",False,True,
+CONV00054,95,2025-05-07T00:42:03,2025-05-07T00:44:39,"[""cancelar póliza""]",False,True,
+CONV00055,64,2025-05-17T20:35:55,2025-05-17T20:37:25,"[""cancelar póliza"", ""cambiar vehículo"", ""revisión cobertura""]",False,True,5
+CONV00056,85,2025-04-15T01:46:41,2025-04-15T01:48:53,"[""revisión cobertura""]",False,False,
+CONV00057,8,2025-04-21T22:27:38,2025-04-21T22:28:09,"[""cambiar vehículo"", ""revisión cobertura"", ""pagar cuota""]",False,False,4
+CONV00058,91,2025-05-07T00:02:45,2025-05-07T00:05:47,"[""cambiar vehículo"", ""consulta estado""]",True,False,
+CONV00059,56,2025-04-18T07:07:32,2025-04-18T07:15:32,"[""cancelar póliza"", ""cambiar vehículo"", ""pagar cuota""]",False,False,2
+CONV00060,55,2025-05-05T20:15:44,2025-05-05T20:25:31,"[""cambiar vehículo"", ""revisión cobertura""]",False,True,
+CONV00061,34,2025-05-22T19:12:25,2025-05-22T19:17:06,"[""revisión cobertura""]",True,True,
+CONV00062,23,2025-04-13T12:09:33,2025-04-13T12:15:27,"[""cambiar vehículo"", ""consulta estado"", ""revisión cobertura""]",True,True,
+CONV00063,85,2025-04-30T20:38:20,2025-04-30T20:40:10,"[""consulta estado""]",True,False,
+CONV00064,39,2025-04-01T19:59:56,2025-04-01T20:06:04,"[""cancelar póliza"", ""revisión cobertura"", ""pagar cuota""]",False,False,4
+CONV00065,70,2025-03-31T13:59:44,2025-03-31T14:04:36,"[""cancelar póliza""]",True,False,4
+CONV00066,89,2025-04-01T09:47:32,2025-04-01T09:48:35,"[""cambiar vehículo"", ""revisión cobertura"", ""pagar cuota""]",True,True,4
+CONV00067,48,2025-04-13T13:44:08,2025-04-13T13:53:03,"[""cambiar vehículo"", ""revisión cobertura"", ""consulta estado""]",True,False,
+CONV00068,93,2025-05-02T22:29:11,2025-05-02T22:37:58,"[""cancelar póliza"", ""revisión cobertura"", ""consulta estado""]",True,True,3
+CONV00069,43,2025-04-24T22:44:10,2025-04-24T22:48:49,"[""cancelar póliza"", ""pagar cuota""]",True,True,
+CONV00070,76,2025-04-11T18:14:19,2025-04-11T18:19:00,"[""cambiar vehículo""]",True,False,
+CONV00071,74,2025-05-01T12:25:58,2025-05-01T12:30:40,"[""cambiar vehículo""]",True,True,2
+CONV00072,50,2025-06-28T11:13:15,2025-06-28T11:13:58,"[""cambiar vehículo"", ""consulta estado"", ""cancelar póliza""]",False,False,3
+CONV00073,79,2025-06-28T21:11:27,2025-06-28T21:16:24,"[""consulta estado"", ""pagar cuota""]",True,False,
+CONV00074,57,2025-04-06T11:17:02,2025-04-06T11:26:44,"[""cambiar vehículo"", ""cancelar póliza"", ""consulta estado""]",False,True,3
+CONV00075,88,2025-05-29T05:48:39,2025-05-29T05:57:09,"[""cancelar póliza"", ""pagar cuota""]",True,True,
+CONV00076,100,2025-06-08T08:03:08,2025-06-08T08:06:14,"[""pagar cuota"", ""cambiar vehículo""]",True,False,4
+CONV00077,22,2025-06-28T06:43:54,2025-06-28T06:49:54,"[""pagar cuota"", ""revisión cobertura""]",False,True,5
+CONV00078,88,2025-04-25T13:14:59,2025-04-25T13:20:32,"[""consulta estado"", ""pagar cuota""]",True,True,2
+CONV00079,56,2025-04-20T16:36:13,2025-04-20T16:38:04,"[""cambiar vehículo"", ""consulta estado"", ""cancelar póliza""]",False,True,4
+CONV00080,41,2025-05-20T23:50:58,2025-05-20T23:54:54,"[""cancelar póliza"", ""consulta estado""]",True,False,
+CONV00081,44,2025-04-29T07:22:04,2025-04-29T07:26:31,"[""consulta estado""]",True,False,
+CONV00082,72,2025-04-25T19:16:50,2025-04-25T19:21:45,"[""cambiar vehículo"", ""pagar cuota"", ""revisión cobertura""]",False,False,2
+CONV00083,36,2025-04-04T08:52:00,2025-04-04T09:01:25,"[""consulta estado"", ""revisión cobertura""]",False,False,5
+CONV00084,28,2025-05-07T10:31:57,2025-05-07T10:36:50,"[""consulta estado"", ""pagar cuota"", ""revisión cobertura""]",False,False,5
+CONV00085,69,2025-04-27T14:33:04,2025-04-27T14:38:51,"[""pagar cuota""]",True,False,1
+CONV00086,67,2025-06-23T14:35:52,2025-06-23T14:40:29,"[""consulta estado"", ""pagar cuota"", ""cancelar póliza""]",True,False,2
+CONV00087,68,2025-05-26T14:55:02,2025-05-26T14:56:07,"[""revisión cobertura"", ""cancelar póliza""]",False,False,3
+CONV00088,1,2025-05-07T09:55:59,2025-05-07T10:05:57,"[""pagar cuota"", ""cancelar póliza""]",True,False,1
+CONV00089,10,2025-04-09T01:35:31,2025-04-09T01:42:57,"[""pagar cuota"", ""cancelar póliza""]",False,False,2
+CONV00090,85,2025-06-20T04:13:06,2025-06-20T04:13:59,"[""cambiar vehículo"", ""pagar cuota"", ""cancelar póliza""]",False,False,2
+CONV00091,20,2025-06-01T00:04:32,2025-06-01T00:10:50,"[""revisión cobertura""]",False,False,2
+CONV00092,7,2025-06-04T04:19:00,2025-06-04T04:28:41,"[""consulta estado"", ""pagar cuota"", ""cambiar vehículo""]",False,False,5
+CONV00093,81,2025-05-10T13:21:47,2025-05-10T13:31:33,"[""revisión cobertura""]",False,True,5
+CONV00094,93,2025-04-14T15:01:36,2025-04-14T15:11:24,"[""consulta estado""]",False,False,5
+CONV00095,92,2025-04-30T04:29:29,2025-04-30T04:38:47,"[""pagar cuota"", ""revisión cobertura""]",False,False,5
+CONV00096,29,2025-06-10T19:45:21,2025-06-10T19:50:48,"[""revisión cobertura"", ""cancelar póliza""]",False,False,3
+CONV00097,11,2025-06-12T04:47:15,2025-06-12T04:56:53,"[""pagar cuota"", ""cancelar póliza""]",False,True,
+CONV00098,26,2025-06-26T20:49:57,2025-06-26T20:54:09,"[""cancelar póliza"", ""cambiar vehículo""]",True,True,
+CONV00099,46,2025-06-02T01:13:38,2025-06-02T01:19:50,"[""cancelar póliza""]",True,True,1
+CONV00100,75,2025-06-25T18:49:30,2025-06-25T18:53:08,"[""revisión cobertura"", ""pagar cuota"", ""cambiar vehículo""]",False,True,
