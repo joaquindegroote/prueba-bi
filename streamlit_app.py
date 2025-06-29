@@ -6,8 +6,9 @@ import yaml
 st.set_page_config(page_title="Prueba BI Demo", layout="wide")
 
 # 1. Load CSVs into DuckDB in-memory
-@st.cache_data
-def load_duck():
+# ---------- Carga de datos en DuckDB ----------
+@st.cache_resource          # ← en vez de st.cache_data
+def get_duck():
     con = duckdb.connect()
     for csv in Path("data").glob("*.csv"):
         con.execute(
@@ -16,7 +17,7 @@ def load_duck():
         )
     return con
 
-con = load_duck()
+con = get_duck()
 
 # 2. Question catalogue (add/modify freely)
 QUESTIONS = {
