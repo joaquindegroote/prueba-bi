@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 
 st.set_page_config(page_title="Prueba BI Demo", layout="wide")
+st.sidebar.write("Tablas cargadas:", con.sql("SHOW TABLES").df())
 
 # 1. Load CSVs into DuckDB in-memory
 # ---------- Carga de datos en DuckDB ----------
