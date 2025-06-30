@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import sqlite3
+from datetime import date, timedelta
 
 st.set_page_config(page_title="Prueba Técnica SQL", layout="wide")
 st.title("Prueba Técnica – SQL & Casos de Uso")
@@ -15,7 +16,7 @@ def load_data():
 
 @st.cache_resource(show_spinner="Inicializando base en memoria…")
 def get_connection() -> sqlite3.Connection:
-    """Carga los CSV en una BD SQLite en memoria (multi‑thread)."""
+    """Carga los CSV en una BD SQLite en memoria (multi-thread)."""
     policies, fees = load_data()
     conn = sqlite3.connect(":memory:", check_same_thread=False)
     policies.to_sql('policies', conn, index=False, if_exists='replace')
@@ -26,10 +27,14 @@ conn = get_connection()
 
 # --------  Tabs ---------------------------------------------------------------------------
 
-tab1, tab2 = st.tabs(["Sección 1: Consultas SQL", "Sección 2: Casos de Uso"])
+tab1, tab2, tab3 = st.tabs([
+    "Sección 1: Consultas SQL",
+    "Sección 2: Casos de Uso",
+    "Sección 3: Pregunta Abierta"
+])
 
 # ==========================================================================================
-# TAB 1 – CONSULTAS SQL
+# TAB 1 – CONSULTAS SQL 
 # ==========================================================================================
 with tab1:
     # -------------------- Consulta 1 ------------------------------------------------------
@@ -60,76 +65,69 @@ ORDER BY cantidad DESC;
     st.subheader("¿Por qué es valioso este conteo?")
     st.markdown(
         """
-- **Underwriting** identifica concentraciones de riesgo y ajusta tarifas por segmento.
-- **Marketing** diseña campañas específicas (cross‑sell de coberturas premium, upsell de asistencia) para los segmentos de mayor flota.
-- **Operaciones** negocia descuentos de repuestos/talleres donde la aseguradora tiene mayor volumen.
-        """)
+El conteo de vehículos activos permite detectar tendencias de riesgo por marca, modelo y año y ajustar tarifas, límites y retenciones según la experiencia de siniestralidad; provee a **Actuaría** la base empírica para estimar frecuencia y severidad y calcular el *loss ratio* segmentado, indispensable para reservas técnicas y negociaciones de reaseguro; ofrece a **Marketing & Growth** una segmentación granular desde la cual diseñar campañas de *cross‑sell* y *upsell* y programas de fidelización basados en el LTV; satisface los requerimientos de **Cumplimiento Regulatorio** en informes de concentración de cartera; y entrega a **Operaciones** la masa crítica necesaria para negociar mejores SLA y precios con talleres y proveedores, reduciendo tanto costo como *turn‑around‑time*.
+        """
+    )
 
     st.subheader("Mejoras técnicas (Postgres)")
     st.markdown(
         """
-- **Columnas generadas** (`brand_g`, `model_g`, `year_g`) → permiten índices B‑tree clásicos, evitando `json_extract` en tiempo de ejecución.
-- **Índices GIN parciales** sobre `(vehicle -> 'brand')` y `(vehicle -> 'model')` **dentro** del `WHERE status = 'active'`.
-- **Particionamiento** por rango de `created_at` para data warehouse con >100 M pólizas.
-        """)
+- **Columnas generadas** + índices B‑tree → habilitan *index‑only scans* y evitan `json_extract` en tiempo de ejecución.
+- **Índices GIN parciales** (`WHERE status='active'`) sobre JSONB → aceleran exploraciones ad‑hoc sin penalizar escrituras de pólizas inactivas.
+- **Particionamiento por rango** (`created_at` mes) → facilita archivado (*DETACH*) y *partition‑pruning* en dashboards.
+        """
+    )
 
     st.divider()
 
     # -------------------- Consulta 2 ------------------------------------------------------
     st.header("2. Prima total por póliza")
     query2 = """
-SELECT
-    policy_id,
-    SUM(CAST(json_extract(cov.value, '$.premium') AS REAL)) AS prima_total
-FROM policies
-CROSS JOIN json_each(policies.coverages) AS cov
-GROUP BY policy_id
-ORDER BY prima_total DESC;
+SELECT policy_id,
+       SUM(CAST(json_extract(cov.value, '$.premium') AS REAL)) AS prima_total
+FROM   policies
+CROSS  JOIN json_each(policies.coverages) AS cov
+GROUP  BY policy_id
+ORDER  BY prima_total DESC;
 """
     st.code(query2, language='sql')
     if st.button("💰 Ejecutar Consulta 2"):
         df2 = pd.read_sql(query2, conn)
         st.dataframe(df2.head(15), use_container_width=True)
-        if not df2.empty:
-            st.caption("Top‑15 pólizas por prima total")
 
     st.subheader("¿Por qué sumar las primas?")
     st.markdown(
         """
-- **Finanzas**: proyección de ingresos y detección de pólizas con sobreprecio/subprecio.
-- **Auditoría**: comparar prima escrita vs. prima facturada para reducir fuga de ingresos.
-- **Actuaría**: calcular métrica *Average Written Premium* y alimentar modelos de severidad.
-        """)
+La prima total por póliza constituye el insumo central para **Finanzas** al proyectar ingresos escritos frente a ganados y alimentar el *forecast* trimestral; permite a **Auditoría** cotejar lo escrito con lo efectivamente facturado y detectar fugas en el proceso de cobranza; entrega a **Actuaría** el *Average Written Premium* utilizado en pricing y en el cálculo de reservas IBNR; ayuda a **Producto & Pricing** a experimentar con bundles y medir la elasticidad precio‑demanda para optimizar el margen técnico; y da a **Riesgo & Reaseguro** visibilidad sobre la exposición agregada necesaria para definir capas de retención y coberturas facultativas.
+        """
+    )
 
     st.subheader("Mejoras técnicas (Postgres)")
     st.markdown(
         """
-- **Vista materializada `mv_primas`** con refresh nocturno, reduciendo latencia de dashboards.
-- **Índice funcional** sobre la suma de `premium` → acelera filtros `ORDER BY prima_total DESC LIMIT 20`.
-- Migrar el tipo a **`NUMERIC(12,2)`** para evitar pérdida de precisión cuando `premium` excede 2^24.
-        """)
+- **Vista materializada** `mv_primas` (*REFRESH nocturno*) → SLA sub‑segundo en reportes.
+- **Índice funcional** sobre `SUM(premium)` → acelera *TOP‑N queries*.
+- **Tipo `NUMERIC(12,2)`** → evita errores de redondeo y cumple normativas SOX.
+- **CHECK de moneda** + tabla `exchange_rates` → garantiza consistencia multimoneda.
+        """
+    )
 
     st.divider()
 
     # -------------------- Consulta 3 ------------------------------------------------------
     st.header("3. Próxima cuota pendiente")
     query3 = """
-SELECT
-    f.policy_id,
-    f.fee_id,
-    f.due_date,
-    f.amount
-FROM fees AS f
-WHERE f.status IN ('pending','overdue')
-  AND f.due_date >= date('now')
-  AND f.due_date = (
-      SELECT MIN(due_date)
-      FROM fees
-      WHERE policy_id = f.policy_id
-        AND status IN ('pending','overdue')
-        AND due_date >= date('now')
-  )
-ORDER BY f.policy_id;
+SELECT f.policy_id, f.fee_id, f.due_date, f.amount
+FROM   fees AS f
+WHERE  f.status IN ('pending','overdue')
+  AND  f.due_date >= date('now')
+  AND  f.due_date = (
+        SELECT MIN(due_date)
+        FROM   fees
+        WHERE  policy_id = f.policy_id
+          AND  status IN ('pending','overdue')
+          AND  due_date >= date('now'))
+ORDER  BY f.policy_id;
 """
     st.code(query3, language='sql')
     if st.button("⏰ Ejecutar Consulta 3"):
@@ -138,144 +136,169 @@ ORDER BY f.policy_id;
             df3['due_date'] = pd.to_datetime(df3['due_date'])
         st.dataframe(df3, use_container_width=True)
         if not df3.empty:
-            txt = (
-                f"Ejemplo de recordatorio automático: próxima cuota para la póliza #{df3.iloc[0]['policy_id']} "
-                f"vence el {df3.iloc[0]['due_date'].date()} ✉️"
-            )
-            st.caption(txt)
+            st.caption(f"Recordatorio: la próxima cuota de la póliza #{df3.iloc[0]['policy_id']} vence el {df3.iloc[0]['due_date'].date()} ✉️")
 
     st.subheader("¿Por qué necesitamos la próxima cuota?")
     st.markdown(
         """
-- **Cobranza**: enfocar recordatorios y evitar mora antes de la fecha crítica.
-- **Customer Success**: prevenir cancelaciones enviando ofertas de refinanciamiento.
-- **Tesorería**: pronosticar flujo de caja diario/semanal.
-        """)
-
-    st.subheader("Mejoras técnicas (Postgres)")
-    st.markdown(
+Conocer la próxima cuota pendiente habilita a **Cobranza** a programar recordatorios multicanal y ofrecer planes de pago antes de que se materialice la mora; permite a **Tesorería** refinar el flujo de caja proyectado y asegurar liquidez frente a obligaciones regulatorias y pagos de siniestros; brinda a **Customer Success** la oportunidad de intervenir proactivamente para evitar cancelaciones y reducir el *churn*; ayuda a **Riesgo & Cumplimiento** a prevenir contingencias legales asociadas a pólizas sin cobertura por impago; y mejora la experiencia de cliente al desencadenar notificaciones *in‑app* o *push* que protegen el NPS.
         """
-- **Índice parcial** `(policy_id, due_date)` **WHERE status IN ('pending','overdue')`.
-- Calendario de pagos como **tabla de hechos** en un modelo estrella → facilita análisis por periodo.
-- Automatizar recordatorios vía **cron + webhook** (SMS/WhatsApp) usando la consulta como fuente.
-        """)
+    )
 
     st.divider()
 
-    # -------------------- Sección 4 --------------------------------------------------------
-    st.header("4. Limitaciones y roadmap de mejora")
-
-    roadmap_df = pd.DataFrame({
-        'Limitación actual': [
-            'Datos anidados en JSONB',
-            'Sin historización de cambios',
-            'Escalabilidad OLAP',
-            'Seguridad PII/PCI',
-            'Rendimiento en consultas temporales'
-        ],
-        'Mejora propuesta': [
-            'Normalizar tablas vehicle / coverages',
-            'SCD‑Type 2 o snapshots diarios',
-            'Data Lake bronze‑silver‑gold (Parquet/Iceberg)',
-            'RLS + cifrado transparente',
-            'Particionamiento por rango (created_at) + índices parciales'
-        ],
-        'Justificación': [
-            'Índices simples, FKs, JOINs eficientes',
-            'Auditoría, GDPR/CCPA compliance',
-            'Coste/GB bajo + compute elástico',
-            'Minimizar riesgo de fuga de datos',
-            'Menor I/O y tiempos < 200 ms'
-        ]
-    })
-    st.dataframe(roadmap_df, use_container_width=True, hide_index=True)
-
 # ==========================================================================================
-# TAB 2 – CASOS DE USO (ETL y Bot IA)
+# TAB 2 – CASOS DE USO 
 # ==========================================================================================
 with tab2:
     st.header("Caso 1 – Integración mensual de siniestros (CSV → DW)")
 
-    st.subheader("SQL principal (idempotente)")
-    st.code(
-        """
-INSERT INTO claims AS c (
-    claim_id, policy_number, claim_amount, source_file, loaded_at)
-SELECT s.claim_id,
-       s.policy_number,
-       s.claim_amount,
-       s._source_file,
-       CURRENT_TIMESTAMP
-FROM   stg_claims_csv s
-ON CONFLICT (claim_id) DO UPDATE
-  SET  claim_amount = EXCLUDED.claim_amount,
-       source_file  = EXCLUDED.source_file,
-       updated_at   = CURRENT_TIMESTAMP;
-""",
-        language='sql')
-
-    st.subheader("Flujo resumido y valor de negocio")
-    st.markdown(
-        """
-- **Idempotencia** evita duplicados cuando el CSV se re-ejecuta.
-- **Hash SHA-256** del archivo garantiza integridad y trazabilidad.
-- **Alertas Slack/Email** si la carga falla (>5 % filas con error) → *time-to-detect* < 10 min.
-- Reducción estimada de **2 h/día** de trabajo manual del analista de datos.
+    with st.expander("1️⃣  Proceso propuesto", expanded=True):
+        st.markdown("""
+**Seis pasos ETL (versión enriquecida)**
+1. **Recepción** ▸ bucket *landing* inmutable con versionado + *object lock*.
+2. **Validación** ▸ *Great Expectations* ➜ métricas en DataDog, corte si `unexpected_percent > 1%`.
+3. **Staging** ▸ ingesta append‑only con `source_file`, `ingested_at` y hash MD5.
+4. **Transformación** ▸ normaliza unidades, deduplica vía *window function* y flag para MERGE.
+5. **Historización** ▸ Delta Lake SCD‑2 idempotente (*exactly‑once*).
+6. **Monitoreo** ▸ eventos OpenLineage + SLAs Airflow → alertas Slack/PagerDuty.
         """)
 
-    st.subheader("Mejoras técnicas propuestas")
-    st.markdown(
-        """
-- Validar esquema con **Great Expectations** antes de cargar.
-- Convertir CSV a **Parquet + Arrow** para COPY paralelo en Postgres.
-- Orquestación **Airflow** con DAG modular (extract → validate → load) y política de retries exponenciales.
+    with st.expander("2️⃣  Problemas potenciales", expanded=True):
+        st.markdown("""
+| Problema | Ejemplo | Impacto |
+|---|---|---|
+| **Drift de esquema** | Nueva columna `currency` | Carga falla o columnas desalineadas |
+| **Codificación/delimitadores** | UTF‑16, separador `;` | Valores mal parseados |
+| **Datos inconsistentes** | `claim_amount` negativo | Cálculos erróneos |
+| **Inconsistencia referencial** | `claim` sin `policy_number` | Siniestros huérfanos |
+| **Duplicados** | Misma clave `policy+claim` | Sobreconteo de siniestros |
+| **Volumen creciente** | CSV > 2 GB | Riesgo *OOM* y ventana rota |
+| **Seguridad & PII** | Nombres sin cifrar | Riesgo de fuga de datos |
+| **Retrasos de entrega** | Archivo fuera SLA | Brechas en reporting |
+        """, unsafe_allow_html=True)
+
+    with st.expander("3️⃣  Solución escalable", expanded=True):
+        st.markdown("""
+Arquitectura **lakehouse** (Parquet/Delta Bronze→Silver→Gold) + orquestador declarativo (Airflow/Prefect).  
+Contratos de datos (JSON Schema) garantizan calidad; transformaciones idempotentes; MERGE SCD‑2 preserva histórico.  
+Linaje OpenLineage, código en Git CI/CD, cómputo serverless auto‑escalable (Glue, Databricks Jobs, Dataflow).  
+Cifrado end‑to‑end + IAM de mínimo privilegio.
         """)
 
     st.divider()
 
-    st.header("Caso 2 – Métricas de desempeño Bot IA")
-    metrics_df = pd.DataFrame({
-        'Métrica': [
-            'Tasa de resolución', 'CSAT', 'Duración media',
-            '% Fallback intents', 'Conversión por intent', 'Transferencias a agente'
-        ],
-        'SQL (conceptual)': [
-            'AVG(CASE WHEN transferred_to_agent=0 THEN 1 ELSE 0 END)',
-            'AVG(customer_feedback_score)',
-            'AVG(EXTRACT(EPOCH FROM (end_time-start_time))/60)',
-            'SUM(is_fallback)::float / COUNT(*)',
-            'completed / started',
-            'AVG(transferred_to_agent)'
-        ],
-        'Umbral alerta': [
-            '±3 pp diarios', '↓ 0.2 pts/24h', '+20 % semanal',
-            '>5 % hora', '↓10 % semanal', '>10 % hora'
-        ]
-    })
-    st.dataframe(metrics_df, use_container_width=True, hide_index=True)
+    # -------------------- Bot IA ----------------------------------------------------------
+    st.header("Caso 2 – Evaluación de desempeño del Bot de IA")
 
-    st.subheader("Visualizaciones sugeridas")
-    st.markdown(
-        """
-- **Serie temporal dual** Resolución vs. CSAT.
-- **Barras apiladas** éxito / fallback por día.
-- **Gauge realtime** % transferencias.
-- **Heatmap** hora-día × % fallback.
+    with st.expander("1️⃣  Métricas prioritarias", expanded=True):
+        st.markdown("""
+**Matriz de KPIs por dimensión**
+
+| # | Métrica | Dimensión | SQL conceptual | Insight clave |
+|---|---|---|---|---|
+| 1 | **Tasa de Contención** | Eficiencia operativa | `1 - AVG(transferred_to_agent)` | ¿Cuánta carga desviamos del call‑center? |
+| 2 | **Goal Completion Rate (GCR)** | Valor de negocio | `AVG(conversation_successful)` | ¿Resolvemos realmente la intención del usuario? |
+| 3 | **CSAT** | Experiencia de cliente | `AVG(customer_feedback_score)` | ¿Les gusta a los usuarios interactuar con el bot? |
+-  **Tiempo promedio de respuesta** Como analisis transversal, cada una de las metricas anteriores se puede complementar analizando el aspecto temporal, por ejemplo si la duracion de la conversacion o tiempo de respuesta afecta el feedback recibido, o la cantidad de consultas derivadas a personas, indicando por ejemplo un problema en solicitudes de mayor duracion o complejidad por perdida de contexto/memoria del LLM.     
+                    """, unsafe_allow_html=True)
+        st.markdown("> Las tres primeras son las **North‑Star Metrics**; las secundarias se vigilan para detectar la raíz de un cambio inesperado.")
+
+    with st.expander("2️⃣  Patrones / alertas", expanded=True):
+        st.markdown("""
+- ↑ **Fallback Rate** para un intent → entrenamiento NLU insuficiente.
+- ↑ **Escalaciones** en intent específico (`cambiar_vehiculo`) → flujo demasiado complejo.
+- **Alta Contención pero bajo GCR** → fallo silencioso: el bot "cree" que resuelve, el usuario no.
+- **Drop‑off analysis**: abandono recurrente tras mensaje X → copy confuso o paso engorroso.
+- **Cluster de CSAT ≤ 2** concentrado en ciertos intents → priorizar rediseño de esos flows.
         """)
 
-    st.subheader("Impacto de negocio")
-    st.markdown(
-        """
-Implementar estas métricas reduce la tasa de escalamiento un **12 %** al detectar rápidamente intents mal entrenados y permitir retraining semanal.
+    with st.expander("3️⃣  Visualizaciones para no técnicos", expanded=True):
+        st.markdown("""
+# Diseño Propuesto del Dashboard
+
+## 1. KPIs Principales (La Vista de 30 Segundos)
+
+- En la parte superior del dashboard, se mostrarán las tres métricas prioritarias:  
+  **Tasa de Contención**, **GCR**, **CSAT**, en formato de tarjetas de puntuación (scorecards) grandes.  
+- Cada tarjeta mostrará:
+  - El valor actual
+  - Un indicador de color (**verde/amarillo/rojo**) comparado con el objetivo
+  - Una pequeña línea de tendencia que muestre el cambio respecto al período anterior
+
+---
+
+## 2. Rendimiento a lo Largo del Tiempo (La Vista de Tendencia Semanal)
+
+- Un **gráfico de líneas** que muestre la tendencia de los tres KPIs principales durante los últimos **30 o 90 días**.  
+  Esto ayuda al equipo a entender los ritmos de rendimiento y el impacto de los cambios implementados.
+
+- Un **gráfico de barras apiladas** que muestre el **volumen total de conversaciones diarias**, desglosado por resultado:
+  - `conversation_successful`
+  - `transferred_to_agent`
+  - `fallo/abandono`  
+  Esto proporciona una visión clara del volumen de trabajo del bot y su eficacia.
+
+---
+
+## 3. Diagnóstico Detallado (La Vista de "Dónde Enfocarse Hoy")
+
+- Un **gráfico de barras horizontales** titulado:  
+  **"Top 5 Intents que Generan Más Escalados"**  
+  Esto informa inmediatamente al equipo de operaciones sobre qué flujos de conversación están causando la mayor carga de trabajo humano.
+
+- Una **tabla o gráfico de barras horizontales** titulado:  
+  **"Intents con la Tasa de Éxito Más Baja"**  
+  Esto resalta las partes más "rotas" o ineficaces de la lógica del bot, que requieren atención inmediata.
+.  
+
+Filtros simples (rango fechas, canal) permiten segmentar sin abrumar al equipo de operaciones.
         """)
 
-    st.subheader("Próximas extensiones técnicas")
-    st.markdown(
-        """
-- Pipeline streaming con **Kafka + Flink** para métricas en <5 s.
-- Almacenamiento en **TimescaleDB** para queries de ventana eficientes.
-- Integrar **alertas automáticas** via PagerDuty cuando se crucen umbrales críticos.
-        """)
+    st.divider()
 
-st.sidebar.success("Aplicación cargada con ejemplos ampliados y roadmap estratégico 🏆")
+# ==========================================================================================
+# TAB 3 – PREGUNTA ABIERTA
+# ==========================================================================================
+with tab3:
+    st.header("Sección 3 – Pregunta Abierta")
+
+    st.subheader("Problema:")
+    st.write(
+        "En el marco de un servicio de consultoría en RedSalud, trabajé "
+        "analizando datos clínicos en BigQuery con tablas que superaban "
+        "los 100 millones de registros. Los datos eran crudos, poco "
+        "estructurados y altamente voluminosos, lo que dificultaba el "
+        "análisis y generaba altos tiempos de consulta."
+    )
+
+    st.subheader("Solución:")
+    st.write(
+        "Estandarizamos y limpiamos los datos, optimizamos las consultas "
+        "mediante particiones, índices y transformaciones, y creamos una "
+        "capa semántica para facilitar el análisis. Luego aplicamos "
+        "modelos de clustering para segmentación interpretable."
+    )
+
+    st.subheader("Impacto:")
+    st.write(
+        "La segmentación permitió diseñar un plan de beneficios con lógica "
+        "familiar en lugar de individual, mejorando la eficiencia y la "
+        "atención al paciente con campañas preventivas más efectivas. "
+        "Se implementaron dashboards funcionales y consultas optimizadas "
+        "reutilizables."
+    )
+
+    st.markdown(
+        "**Adicionalmente**, trabajé en Outlier realizando RLHF, entrenando "
+        "modelos de IA conversacional mediante retroalimentación humana en tareas "
+        "de codificación y atención general en español e inglés. Esta experiencia "
+        "me familiarizó con los criterios de éxito, fallos comunes y métricas clave "
+        "para evaluar el desempeño de bots y prompts."
+    )
+
+st.sidebar.success("Para abordar este problema opte por generar una base ficticia de datos con las indicaciones, permitiendo verificar el funcionamiento de las consultas, y hacer ejemplos mas concretos, ademas opte por montarlo en streamlit cloud desde git para incorporar herramientas de interes para el puesto✅")
+
+
+
 
