@@ -147,6 +147,34 @@ Conocer la próxima cuota pendiente habilita a **Cobranza** a programar recordat
 
     st.divider()
 
+     # -------------------- Sección 4 --------------------------------------------------------
+    st.header("4. Limitaciones y roadmap de mejora")
+
+    roadmap_df = pd.DataFrame({
+        'Limitación actual': [
+            'Datos anidados en JSONB',
+            'Sin historización de cambios',
+            'Escalabilidad OLAP',
+            'Seguridad PII/PCI',
+            'Rendimiento en consultas temporales'
+        ],
+        'Mejora propuesta': [
+            'Normalizar tablas vehicle / coverages',
+            'SCD‑Type 2 o snapshots diarios',
+            'Data Lake bronze‑silver‑gold (Parquet/Iceberg)',
+            'RLS + cifrado transparente',
+            'Particionamiento por rango (created_at) + índices parciales'
+        ],
+        'Justificación': [
+            'Índices simples, FKs, JOINs eficientes',
+            'Auditoría, GDPR/CCPA compliance',
+            'Coste/GB bajo + compute elástico',
+            'Minimizar riesgo de fuga de datos',
+            'Menor I/O y tiempos < 200 ms'
+        ]
+    })
+    st.dataframe(roadmap_df, use_container_width=True, hide_index=True)
+
 # ==========================================================================================
 # TAB 2 – CASOS DE USO 
 # ==========================================================================================
